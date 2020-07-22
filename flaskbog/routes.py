@@ -100,3 +100,19 @@ def new_post():
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
+
+
+@app.route("/post/<int:post_id>",  methods=['GET', 'POST'])
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    comments = Comment.query.all()
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(content=form.content.data, author=current_user)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('post.html', post=post, form=form, comments=comments)
+
+
